@@ -86,4 +86,14 @@ public class Book {
     public void setAuthors(List<Author> authors) {
         this.authors = authors;
     }
+
+    @Override
+    public String toString() {
+        return "\n" + "==== LIBRO ====" + "\n" +
+                "Título: " + title + "\n" +
+                "Autores: " + authors.get(0).getName() + "\n" +
+                "Idiomas: " + languages.get(0) + "\n" +
+                "Nümero de descargas: " + numDownloads + "\n" +
+                "==============" + "\n";
+    }
 }

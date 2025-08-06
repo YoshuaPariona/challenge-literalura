@@ -80,9 +80,16 @@ public class Main {
                     break;
             }
 
+            if(option > 0 && option < 6) {
+                pauseConsole();
+            }
         }
     }
 
+    private void pauseConsole() {
+        System.out.println("Presiona Enter para continuar . . .");
+        userInput.nextLine();
+    }
     private void showAndRegisterBookByTitle() {
         System.out.println("Ingresa el nombre del libro que desea buscar: ");
         String searchInput = userInput.nextLine();
@@ -93,9 +100,6 @@ public class Main {
         }
 
         String json = apiService.getJson(searchInput);
-        //String json = apiService.getJsonFromFile();
-
-
 
         listDataAuthors = convertDataService.getDataAuthor(json);
         dataBook = convertDataService.getDataBook(json);
@@ -107,6 +111,7 @@ public class Main {
 
         book = new Book(dataBook, listAuthors);
         bookRepository.save(book);
+        System.out.println(book.toString());
     }
 
     private Author checkDuplicateAuthor(Author author) {

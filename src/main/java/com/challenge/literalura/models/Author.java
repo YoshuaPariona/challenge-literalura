@@ -23,7 +23,7 @@ public class Author {
     private Long deathYear;
 
     //RELACIÓN MUCHOS A MUCHOS
-    @ManyToMany(mappedBy = "authors")
+    @ManyToMany(mappedBy = "authors", fetch = FetchType.EAGER)
     private List<Book> books;
 
     //CONSTRUCTORES
@@ -74,5 +74,15 @@ public class Author {
 
     public void setBooks(List<Book> books) {
         this.books = books;
+    }
+
+    @Override
+    public String toString() {
+        return "\n" + "==== AUTOR ====" + "\n" +
+                "Apellidos y nombres: " + name + "\n" +
+                "Año de nacimiento: " + birthYear + "\n" +
+                "Año de fallecimiento: " + deathYear + "\n" +
+                "Libros escritos: " + books + "\n" +
+                "===============" + "\n";
     }
 }
