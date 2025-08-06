@@ -54,6 +54,7 @@ public class Main {
         while(option != 0) {
             System.out.println(menu);
             option = userInput.nextInt();
+            userInput.nextLine();
 
             switch (option) {
                 case 1:
@@ -86,22 +87,31 @@ public class Main {
         System.out.println("Ingresa el nombre del libro que desea buscar: ");
         String searchInput = userInput.nextLine();
 
-        //String json = apiService.getJson(searchInput);
-        String json = apiService.getJsonFromFile();
+        if(bookRepository.findByTitleContainsIgnoreCase(searchInput).isPresent()) {
+            System.out.println("Este libro ya está registrado en la base de datos de literalura.");
+            return;
+        }
+
+        String json = apiService.getJson(searchInput);
+        //String json = apiService.getJsonFromFile();
+
+
 
         listDataAuthors = convertDataService.getDataAuthor(json);
         dataBook = convertDataService.getDataBook(json);
 
         listAuthors = listDataAuthors.stream()
                 .map(Author::new)
-                .collect(Collectors.toList());
-
-        listAuthors = listAuthors.stream()
-                .map(authorRepository::save)
+                .map(this::checkDuplicateAuthor)
                 .collect(Collectors.toList());
 
         book = new Book(dataBook, listAuthors);
         bookRepository.save(book);
+    }
+
+    private Author checkDuplicateAuthor(Author author) {
+        return authorRepository.findByNameContainsIgnoreCase(author.getName())
+                .orElseGet(() -> authorRepository.save(author));
     }
 
     private void showAllBooks() {
