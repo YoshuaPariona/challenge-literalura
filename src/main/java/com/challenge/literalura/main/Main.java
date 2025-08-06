@@ -1,5 +1,7 @@
 package com.challenge.literalura.main;
 
+import com.challenge.literalura.service.ApiService;
+
 import java.util.Scanner;
 
 //Clase principal
@@ -54,11 +56,12 @@ public class Main {
         }
     }
 
-    private void showBooksByLanguage() {
-        System.out.println("En desarrollo");
+    private void showAndRegisterBookByTitle() {
+        ApiService apiService = new ApiService();
+        System.out.println(apiService.getApiResponse("https://gutendex.com/books/"));
     }
 
-    private void showAuthorsInYear() {
+    private void showAllBooks() {
         System.out.println("En desarrollo");
     }
 
@@ -66,11 +69,12 @@ public class Main {
         System.out.println("En desarrollo");
     }
 
-    private void showAllBooks() {
+    private void showAuthorsInYear() {
         System.out.println("En desarrollo");
     }
 
-    private void showAndRegisterBookByTitle() {
+    private void showBooksByLanguage() {
         System.out.println("En desarrollo");
     }
+
 }
