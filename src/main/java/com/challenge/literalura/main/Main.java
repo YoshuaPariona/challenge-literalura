@@ -1,18 +1,39 @@
 package com.challenge.literalura.main;
 
+import com.challenge.literalura.models.Author;
+import com.challenge.literalura.models.Book;
 import com.challenge.literalura.models.DataAuthor;
 import com.challenge.literalura.models.DataBook;
-import com.challenge.literalura.models.DataJson;
-import com.challenge.literalura.service.ApiService;
-import com.challenge.literalura.service.ConvertDataService;
+import com.challenge.literalura.repositories.AuthorRepository;
+import com.challenge.literalura.repositories.BookRepository;
+import com.challenge.literalura.services.ApiService;
+import com.challenge.literalura.services.ConvertDataService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
-//Clase principal
+@Component
 public class Main {
 
-    Scanner userInput = new Scanner(System.in);
+    private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
+    private Scanner userInput = new Scanner(System.in);
+    private ApiService apiService = new ApiService();
+    private ConvertDataService convertDataService = new ConvertDataService();
+    private DataBook dataBook;
+    private Book book;
+    private List<DataAuthor> listDataAuthors;
+    private List<Author> listAuthors;
+    private Author author;
+
+    @Autowired
+    public Main(BookRepository bookRepository, AuthorRepository authorRepository){
+        this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
+    }
 
     public void showMenu() {
         String menu = """
@@ -28,13 +49,13 @@ public class Main {
             
             Elija una opción para continuar:
             """;
-        int opc = -1;
+        int option = -1;
 
-        while(opc != 0) {
+        while(option != 0) {
             System.out.println(menu);
-            opc = userInput.nextInt();
+            option = userInput.nextInt();
 
-            switch (opc) {
+            switch (option) {
                 case 1:
                     showAndRegisterBookByTitle();
                     break;
@@ -62,17 +83,25 @@ public class Main {
     }
 
     private void showAndRegisterBookByTitle() {
-        ApiService apiService = new ApiService();
+        System.out.println("Ingresa el nombre del libro que desea buscar: ");
+        String searchInput = userInput.nextLine();
+
+        //String json = apiService.getJson(searchInput);
         String json = apiService.getJsonFromFile();
-        //System.out.println(json);
 
-        ConvertDataService convertDataService = new ConvertDataService();
+        listDataAuthors = convertDataService.getDataAuthor(json);
+        dataBook = convertDataService.getDataBook(json);
 
-        DataBook dataBook = convertDataService.getDataBook(json);
-        System.out.println(dataBook);
+        listAuthors = listDataAuthors.stream()
+                .map(Author::new)
+                .collect(Collectors.toList());
 
-        List<DataAuthor> dataAuthor = convertDataService.getDataAuthor(json);
-        System.out.println(dataAuthor);
+        listAuthors = listAuthors.stream()
+                .map(authorRepository::save)
+                .collect(Collectors.toList());
+
+        book = new Book(dataBook, listAuthors);
+        bookRepository.save(book);
     }
 
     private void showAllBooks() {

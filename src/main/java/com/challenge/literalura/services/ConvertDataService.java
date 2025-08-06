@@ -1,4 +1,4 @@
-package com.challenge.literalura.service;
+package com.challenge.literalura.services;
 
 import com.challenge.literalura.models.DataAuthor;
 import com.challenge.literalura.models.DataBook;
