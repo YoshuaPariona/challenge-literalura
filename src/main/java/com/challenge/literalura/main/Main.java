@@ -1,7 +1,12 @@
 package com.challenge.literalura.main;
 
+import com.challenge.literalura.models.DataAuthor;
+import com.challenge.literalura.models.DataBook;
+import com.challenge.literalura.models.DataJson;
 import com.challenge.literalura.service.ApiService;
+import com.challenge.literalura.service.ConvertDataService;
 
+import java.util.List;
 import java.util.Scanner;
 
 //Clase principal
@@ -58,7 +63,16 @@ public class Main {
 
     private void showAndRegisterBookByTitle() {
         ApiService apiService = new ApiService();
-        System.out.println(apiService.getApiResponse("https://gutendex.com/books/"));
+        String json = apiService.getJsonFromFile();
+        //System.out.println(json);
+
+        ConvertDataService convertDataService = new ConvertDataService();
+
+        DataBook dataBook = convertDataService.getDataBook(json);
+        System.out.println(dataBook);
+
+        List<DataAuthor> dataAuthor = convertDataService.getDataAuthor(json);
+        System.out.println(dataAuthor);
     }
 
     private void showAllBooks() {
