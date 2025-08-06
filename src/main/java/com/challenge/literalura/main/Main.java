@@ -90,6 +90,12 @@ public class Main {
         System.out.println("Presiona Enter para continuar . . .");
         userInput.nextLine();
     }
+
+    private Author checkDuplicateAuthor(Author author) {
+        return authorRepository.findByNameContainsIgnoreCase(author.getName())
+                .orElseGet(() -> authorRepository.save(author));
+    }
+
     private void showAndRegisterBookByTitle() {
         System.out.println("Ingresa el nombre del libro que desea buscar: ");
         String searchInput = userInput.nextLine();
@@ -114,13 +120,17 @@ public class Main {
         System.out.println(book.toString());
     }
 
-    private Author checkDuplicateAuthor(Author author) {
-        return authorRepository.findByNameContainsIgnoreCase(author.getName())
-                .orElseGet(() -> authorRepository.save(author));
-    }
-
     private void showAllBooks() {
-        System.out.println("En desarrollo");
+        List<String> bookLanguages = bookRepository.findAllBooksWithLanguages().stream()
+                .flatMap(b -> b.getLanguages().stream())
+                .distinct()
+                .toList();
+
+        List<Book> completeBook =  bookRepository.findAllBooksWithAuthors();
+
+        completeBook.forEach(b -> b.setLanguages(bookLanguages));
+        completeBook.forEach(System.out::println);
+
     }
 
     private void showAllAuthors() {

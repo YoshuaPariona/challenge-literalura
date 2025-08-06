@@ -5,12 +5,12 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "authors")
+@Table(name = "author")
 public class Author {
     //ID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long authorId;
 
     //NOMBRE
     @Column(unique = true)
@@ -23,7 +23,7 @@ public class Author {
     private Long deathYear;
 
     //RELACIÓN MUCHOS A MUCHOS
-    @ManyToMany(mappedBy = "authors", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "authors")
     private List<Book> books;
 
     //CONSTRUCTORES
@@ -36,12 +36,14 @@ public class Author {
     }
 
     //SETTERS Y GETTERS
-    public Long getId() {
-        return id;
+
+
+    public Long getAuthorId() {
+        return authorId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setAuthorId(Long authorId) {
+        this.authorId = authorId;
     }
 
     public String getName() {

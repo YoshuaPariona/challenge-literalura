@@ -5,12 +5,12 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "books")
+@Table(name = "book")
 public class Book {
     //ID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long bookId;
 
     //TÍTULO
     @Column(unique = true)
@@ -19,7 +19,7 @@ public class Book {
     //LISTA DE LENGUAJES
     @ElementCollection
     @CollectionTable(
-            name = "book_languages",
+            name = "book_language",
             joinColumns = @JoinColumn(name = "book_id")
     )
     private List<String> languages;
@@ -28,11 +28,11 @@ public class Book {
     private Long numDownloads;
 
     //RELACIÓN MUCHOS A MUCHOS
-    @ManyToMany
+    @ManyToMany()
     @JoinTable(
-            name = "books_authors", // tabla intermedia
-            joinColumns = @JoinColumn(name = "book_id"),
-            inverseJoinColumns = @JoinColumn(name = "author_id")
+            name = "book_author",
+            joinColumns = @JoinColumn(name = "book_id", referencedColumnName = "bookId"),
+            inverseJoinColumns = @JoinColumn(name = "author_id", referencedColumnName = "authorId")
     )
     private List<Author> authors;
 
@@ -46,13 +46,12 @@ public class Book {
         this.authors = authors;
     }
 
-
     //SETTERS Y GETTERS
     public Long getId() {
-        return id;
+        return bookId;
     }
     public void setId(Long id) {
-        this.id = id;
+        this.bookId = id;
     }
 
     public String getTitle() {
@@ -89,11 +88,17 @@ public class Book {
 
     @Override
     public String toString() {
+
+        String authorList = authors.stream()
+                .map(Author::getName)
+                .reduce((a1, a2) -> a1 + "; " + a2)
+                .orElse("N/A");
+
         return "\n" + "==== LIBRO ====" + "\n" +
                 "Título: " + title + "\n" +
-                "Autores: " + authors.get(0).getName() + "\n" +
-                "Idiomas: " + languages.get(0) + "\n" +
-                "Nümero de descargas: " + numDownloads + "\n" +
+                "Autores: " + authorList + "\n" +
+                "Idiomas: " + (languages.isEmpty() ? "N/A" : String.join(", ", languages)) + "\n" +
+                "Número de descargas: " + numDownloads + "\n" +
                 "==============" + "\n";
     }
 }
