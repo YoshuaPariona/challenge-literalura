@@ -15,4 +15,5 @@ public class LangService {
         return langRepository.findByLangCodeContainsIgnoreCase(langCode)
                 .orElseGet(() -> langRepository.save(new Lang(langCode)));
     }
+
 }

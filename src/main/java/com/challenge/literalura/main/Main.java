@@ -4,34 +4,30 @@ import com.challenge.literalura.models.*;
 import com.challenge.literalura.repositories.AuthorRepository;
 import com.challenge.literalura.repositories.BookRepository;
 import com.challenge.literalura.repositories.LangRepository;
-import com.challenge.literalura.services.ApiService;
+import com.challenge.literalura.services.AuthorService;
 import com.challenge.literalura.services.BookService;
-import com.challenge.literalura.services.ConvertDataService;
+import com.challenge.literalura.services.LangService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 @Component
 public class Main {
 
     @Autowired
     private BookService bookService;
+    @Autowired
+    private AuthorService authorService;
+    @Autowired
+    private LangService langService;
 
-    private final BookRepository bookRepository;
-    private final AuthorRepository authorRepository;
-    private final LangRepository langRepository;
     private Scanner userInput = new Scanner(System.in);
 
 
     @Autowired
     public Main(BookRepository bookRepository, AuthorRepository authorRepository, LangRepository langRepository){
-        this.bookRepository = bookRepository;
-        this.authorRepository = authorRepository;
-        this.langRepository = langRepository;
     }
 
     public void showMenu() {
@@ -86,7 +82,7 @@ public class Main {
     }
 
     private void pauseConsole() {
-        System.out.println("Presiona Enter para continuar . . .");
+        System.out.println("\n Presiona Enter para continuar . . .");
         userInput.nextLine();
     }
 
@@ -100,7 +96,7 @@ public class Main {
             return;
         }
 
-        Book book = bookService.fetchAndSaveBook(searchInput);
+        Book book = bookService.findAndRegisterBookByTitle(searchInput);
         System.out.println(book);
     }
 
@@ -110,15 +106,23 @@ public class Main {
     }
 
     private void showAllAuthors() {
-        System.out.println("En desarrollo");
+        List<Author> authors = authorService.getAllAuthorsWithBooks();
+        authors.forEach(System.out::println);
     }
 
     private void showAuthorsInYear() {
-        System.out.println("En desarrollo");
+        System.out.println("Ingrese el año en el que el autor aún vivía: ");
+        Long year = userInput.nextLong();
+        userInput.nextLine();
+        List<Author> authors = authorService.getAuthorsLiveInYear(year);
+        authors.forEach(System.out::println);
     }
 
     private void showBooksByLang() {
-        System.out.println("En desarrollo");
+        System.out.println("Ingrese el código del lenguaje por el cual desea buscar");
+        String language = userInput.nextLine();
+        List<Book> books = bookService.getAllBooksWithAuthorsAndLangs(language);
+        books.forEach(System.out::println);
     }
 
 }

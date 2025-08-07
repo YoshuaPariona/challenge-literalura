@@ -35,6 +35,13 @@ public class Author {
         this.deathYear = dataAuthor.deathYear();
     }
 
+    public Author(DataAuthor dataAuthor, List<Book> books) {
+        this.name = dataAuthor.name();
+        this.birthYear = dataAuthor.birthYear();
+        this.deathYear = dataAuthor.deathYear();
+        this.books = books;
+    }
+
     //SETTERS Y GETTERS
 
     public Long getAuthorId() {
@@ -79,11 +86,17 @@ public class Author {
 
     @Override
     public String toString() {
-        return "\n" + "==== AUTOR ====" + "\n" +
+
+        String bookList = books.stream()
+                .map(Book::getTitle)
+                .reduce((a1, a2) -> a1 + " -*- " + a2)
+                .orElse("N/A");
+
+        return "\n" + "======== AUTOR ========" + "\n" +
                 "Apellidos y nombres: " + name + "\n" +
                 "Año de nacimiento: " + birthYear + "\n" +
                 "Año de fallecimiento: " + deathYear + "\n" +
-                "Libros escritos: " + books + "\n" +
-                "===============" + "\n";
+                "Libros escritos: " + bookList + "\n" +
+                "===================";
     }
 }

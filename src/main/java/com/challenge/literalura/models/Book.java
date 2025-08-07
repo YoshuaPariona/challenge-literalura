@@ -92,7 +92,7 @@ public class Book {
 
         String authorList = authors.stream()
                 .map(Author::getName)
-                .reduce((a1, a2) -> a1 + "; " + a2)
+                .reduce((a1, a2) -> a1 + " -*- " + a2)
                 .orElse("N/A");
 
         String langList = langs.stream()
@@ -100,11 +100,11 @@ public class Book {
                 .reduce((a1, a2) -> a1 + ", " + a2)
                 .orElse("N/A");
 
-        return "\n" + "==== LIBRO ====" + "\n" +
+        return "\n" + "======== LIBRO ========" + "\n" +
                 "Título: " + title + "\n" +
-                "Autores: " + authorList + "\n" +
-                "Idiomas: " + langList + "\n" +
+                "Autor(es): " + authorList + "\n" +
+                "Idioma: " + langList + "\n" +
                 "Número de descargas: " + numDownloads + "\n" +
-                "==============" + "\n";
+                "==============";
     }
 }
