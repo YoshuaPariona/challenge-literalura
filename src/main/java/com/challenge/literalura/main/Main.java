@@ -5,6 +5,7 @@ import com.challenge.literalura.repositories.AuthorRepository;
 import com.challenge.literalura.repositories.BookRepository;
 import com.challenge.literalura.repositories.LangRepository;
 import com.challenge.literalura.services.ApiService;
+import com.challenge.literalura.services.BookService;
 import com.challenge.literalura.services.ConvertDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,19 +18,14 @@ import java.util.stream.Collectors;
 @Component
 public class Main {
 
+    @Autowired
+    private BookService bookService;
+
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
     private final LangRepository langRepository;
     private Scanner userInput = new Scanner(System.in);
-    private ApiService apiService = new ApiService();
-    private ConvertDataService convertDataService = new ConvertDataService();
-    private DataBook dataBook;
-    private Book book;
-    private List<DataAuthor> dataAuthorsList;
-    private List<Author> authorsList;
-    private Author author;
-    private List<String> dataLangList;
-    private List<Lang> langList;
+
 
     @Autowired
     public Main(BookRepository bookRepository, AuthorRepository authorRepository, LangRepository langRepository){
@@ -94,64 +90,23 @@ public class Main {
         userInput.nextLine();
     }
 
-    private Author checkDuplicateAuthor(Author author) {
-        return authorRepository.findByNameContainsIgnoreCase(author.getName())
-                .orElseGet(() -> authorRepository.save(author));
-    }
-
-    private Lang checkDuplicateLang(String langCode) {
-        return langRepository.findByLangCodeContainsIgnoreCase(langCode)
-                .orElseGet(() -> langRepository.save(new Lang(langCode)));
-    }
 
     private void showAndRegisterBookByTitle() {
         System.out.println("Ingresa el nombre del libro que desea buscar: ");
         String searchInput = userInput.nextLine();
 
-        if(bookRepository.findByTitleContainsIgnoreCase(searchInput).isPresent()) {
-            System.out.println("Este libro ya está registrado en la base de datos de literalura.");
+        if (bookService.findBookByTitle(searchInput).isPresent()) {
+            System.out.println("Este libro ya está registrado.");
             return;
         }
 
-        String json = apiService.getJson(searchInput);
-
-        dataAuthorsList = convertDataService.getDataAuthor(json);
-        dataBook = convertDataService.getDataBook(json);
-        dataLangList = convertDataService.getDataLang(json);
-
-        langList = dataBook.langs().stream()
-                .map(this::checkDuplicateLang)
-                .toList();
-
-        authorsList = dataAuthorsList.stream()
-                .map(Author::new)
-                .map(this::checkDuplicateAuthor)
-                .collect(Collectors.toList());
-
-        book = new Book(dataBook, authorsList, langList);
-        bookRepository.save(book);
-        System.out.println(book.toString());
+        Book book = bookService.fetchAndSaveBook(searchInput);
+        System.out.println(book);
     }
 
     private void showAllBooks() {
-
-        List<Book> booksWithAuthorsList = bookRepository.findAllBooksWithAuthors();
-        List<Book> booksWithLangsList = bookRepository.findAllBooksWithLangs();
-
-        Map<Long, Book> booksMap = booksWithAuthorsList.stream()
-                .collect(Collectors.toMap(Book::getId, b -> b));
-
-        for (Book booksWithLangs : booksWithLangsList) {
-            Book target = booksMap.get(booksWithLangs.getId());
-            if (target != null) {
-                target.setLangs(booksWithLangs.getLangs());
-            }
-        }
-
-        List<Book> completeBooks = booksMap.values().stream().toList();
-
-        completeBooks.forEach(System.out::println);
-
+        List<Book> books = bookService.getAllBooksWithAuthorsAndLangs();
+        books.forEach(System.out::println);
     }
 
     private void showAllAuthors() {

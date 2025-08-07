@@ -3,12 +3,13 @@ package com.challenge.literalura.services;
 import com.challenge.literalura.models.DataAuthor;
 import com.challenge.literalura.models.DataBook;
 import com.challenge.literalura.models.DataJson;
-import com.challenge.literalura.models.Lang;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class ConvertDataService{
     private ObjectMapper mapper = new ObjectMapper();
 

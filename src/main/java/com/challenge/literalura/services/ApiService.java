@@ -1,5 +1,7 @@
 package com.challenge.literalura.services;
 
+import org.springframework.stereotype.Service;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +10,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+@Service
 public class ApiService {
 
     public String getJson(String searchInput) {
