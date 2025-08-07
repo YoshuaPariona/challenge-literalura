@@ -12,8 +12,8 @@ import java.util.Optional;
 public interface BookRepository extends JpaRepository<Book, Long> {
     Optional<Book> findByTitleContainsIgnoreCase(String titulo);
 
-    @Query("SELECT b FROM Book b JOIN FETCH b.languages")
-    List<Book> findAllBooksWithLanguages();
+    @Query("SELECT b FROM Book b JOIN FETCH b.langs")
+    List<Book> findAllBooksWithLangs();
 
     @Query("SELECT b FROM Book b JOIN FETCH b.authors")
     List<Book> findAllBooksWithAuthors();

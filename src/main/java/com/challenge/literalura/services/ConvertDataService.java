@@ -3,6 +3,7 @@ package com.challenge.literalura.services;
 import com.challenge.literalura.models.DataAuthor;
 import com.challenge.literalura.models.DataBook;
 import com.challenge.literalura.models.DataJson;
+import com.challenge.literalura.models.Lang;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,6 +35,11 @@ public class ConvertDataService{
     public List<DataAuthor> getDataAuthor(String json) {
 
         return getDataBook(json).authors();
+    }
+
+    public List<String> getDataLang(String json) {
+
+        return getDataBook(json).langs();
     }
 
 }

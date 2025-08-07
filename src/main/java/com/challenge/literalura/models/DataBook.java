@@ -10,7 +10,7 @@ public record DataBook(
 
         String title,
         List<DataAuthor> authors,
-        List<String> languages,
+        @JsonAlias("languages") List<String> langs,
         @JsonAlias("download_count") Long numDownloads
 
 ) {

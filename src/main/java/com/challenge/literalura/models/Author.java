@@ -37,7 +37,6 @@ public class Author {
 
     //SETTERS Y GETTERS
 
-
     public Long getAuthorId() {
         return authorId;
     }

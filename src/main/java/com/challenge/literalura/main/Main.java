@@ -1,17 +1,16 @@
 package com.challenge.literalura.main;
 
-import com.challenge.literalura.models.Author;
-import com.challenge.literalura.models.Book;
-import com.challenge.literalura.models.DataAuthor;
-import com.challenge.literalura.models.DataBook;
+import com.challenge.literalura.models.*;
 import com.challenge.literalura.repositories.AuthorRepository;
 import com.challenge.literalura.repositories.BookRepository;
+import com.challenge.literalura.repositories.LangRepository;
 import com.challenge.literalura.services.ApiService;
 import com.challenge.literalura.services.ConvertDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -20,19 +19,23 @@ public class Main {
 
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
+    private final LangRepository langRepository;
     private Scanner userInput = new Scanner(System.in);
     private ApiService apiService = new ApiService();
     private ConvertDataService convertDataService = new ConvertDataService();
     private DataBook dataBook;
     private Book book;
-    private List<DataAuthor> listDataAuthors;
-    private List<Author> listAuthors;
+    private List<DataAuthor> dataAuthorsList;
+    private List<Author> authorsList;
     private Author author;
+    private List<String> dataLangList;
+    private List<Lang> langList;
 
     @Autowired
-    public Main(BookRepository bookRepository, AuthorRepository authorRepository){
+    public Main(BookRepository bookRepository, AuthorRepository authorRepository, LangRepository langRepository){
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
+        this.langRepository = langRepository;
     }
 
     public void showMenu() {
@@ -70,7 +73,7 @@ public class Main {
                     showAuthorsInYear();
                     break;
                 case 5:
-                    showBooksByLanguage();
+                    showBooksByLang();
                     break;
                 case 0:
                     System.out.println("Cerrando la aplicación . . .");
@@ -96,6 +99,11 @@ public class Main {
                 .orElseGet(() -> authorRepository.save(author));
     }
 
+    private Lang checkDuplicateLang(String langCode) {
+        return langRepository.findByLangCodeContainsIgnoreCase(langCode)
+                .orElseGet(() -> langRepository.save(new Lang(langCode)));
+    }
+
     private void showAndRegisterBookByTitle() {
         System.out.println("Ingresa el nombre del libro que desea buscar: ");
         String searchInput = userInput.nextLine();
@@ -107,29 +115,42 @@ public class Main {
 
         String json = apiService.getJson(searchInput);
 
-        listDataAuthors = convertDataService.getDataAuthor(json);
+        dataAuthorsList = convertDataService.getDataAuthor(json);
         dataBook = convertDataService.getDataBook(json);
+        dataLangList = convertDataService.getDataLang(json);
 
-        listAuthors = listDataAuthors.stream()
+        langList = dataBook.langs().stream()
+                .map(this::checkDuplicateLang)
+                .toList();
+
+        authorsList = dataAuthorsList.stream()
                 .map(Author::new)
                 .map(this::checkDuplicateAuthor)
                 .collect(Collectors.toList());
 
-        book = new Book(dataBook, listAuthors);
+        book = new Book(dataBook, authorsList, langList);
         bookRepository.save(book);
         System.out.println(book.toString());
     }
 
     private void showAllBooks() {
-        List<String> bookLanguages = bookRepository.findAllBooksWithLanguages().stream()
-                .flatMap(b -> b.getLanguages().stream())
-                .distinct()
-                .toList();
 
-        List<Book> completeBook =  bookRepository.findAllBooksWithAuthors();
+        List<Book> booksWithAuthorsList = bookRepository.findAllBooksWithAuthors();
+        List<Book> booksWithLangsList = bookRepository.findAllBooksWithLangs();
 
-        completeBook.forEach(b -> b.setLanguages(bookLanguages));
-        completeBook.forEach(System.out::println);
+        Map<Long, Book> booksMap = booksWithAuthorsList.stream()
+                .collect(Collectors.toMap(Book::getId, b -> b));
+
+        for (Book booksWithLangs : booksWithLangsList) {
+            Book target = booksMap.get(booksWithLangs.getId());
+            if (target != null) {
+                target.setLangs(booksWithLangs.getLangs());
+            }
+        }
+
+        List<Book> completeBooks = booksMap.values().stream().toList();
+
+        completeBooks.forEach(System.out::println);
 
     }
 
@@ -141,7 +162,7 @@ public class Main {
         System.out.println("En desarrollo");
     }
 
-    private void showBooksByLanguage() {
+    private void showBooksByLang() {
         System.out.println("En desarrollo");
     }
 
