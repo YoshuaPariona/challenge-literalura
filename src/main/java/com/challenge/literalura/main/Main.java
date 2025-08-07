@@ -18,13 +18,14 @@ public class Main {
 
     @Autowired
     private BookService bookService;
+
     @Autowired
     private AuthorService authorService;
+
     @Autowired
     private LangService langService;
 
     private Scanner userInput = new Scanner(System.in);
-
 
     @Autowired
     public Main(BookRepository bookRepository, AuthorRepository authorRepository, LangRepository langRepository){
@@ -32,7 +33,7 @@ public class Main {
 
     public void showMenu() {
         String menu = """
-            ======== Bienvenido al menú de Literalura! ========
+            \n======== Bienvenido al menú de Literalura! ========
     
             1) Buscar y registrar un libro según su título
             2) Mostrar libros registrados
@@ -48,8 +49,12 @@ public class Main {
 
         while(option != 0) {
             System.out.println(menu);
-            option = userInput.nextInt();
-            userInput.nextLine();
+            try{
+                option = Integer.parseInt(userInput.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Error... Ingrese un número");
+                continue;
+            }
 
             switch (option) {
                 case 1:
@@ -71,7 +76,7 @@ public class Main {
                     System.out.println("Cerrando la aplicación . . .");
                     break;
                 default:
-                    System.out.println("Error... Ingrese una opción válida");
+                    System.out.println("Error. . . Ingrese una opción válida.");
                     break;
             }
 
@@ -86,7 +91,6 @@ public class Main {
         userInput.nextLine();
     }
 
-
     private void showAndRegisterBookByTitle() {
         System.out.println("Ingresa el nombre del libro que desea buscar: ");
         String searchInput = userInput.nextLine();
@@ -97,6 +101,9 @@ public class Main {
         }
 
         Book book = bookService.findAndRegisterBookByTitle(searchInput);
+        if (book == null) {
+            return;
+        }
         System.out.println(book);
     }
 

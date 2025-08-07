@@ -27,7 +27,8 @@ public class ConvertDataService{
         DataJson dataJson = getData(json, DataJson.class);
 
         if (dataJson.results() == null || dataJson.results().isEmpty()) {
-            throw new RuntimeException("No se encontraron libros.");
+            System.out.println("\nEl libro no se encontró.");
+            return null;
         }
 
         return dataJson.results().get(0);
@@ -38,9 +39,5 @@ public class ConvertDataService{
         return getDataBook(json).authors();
     }
 
-    public List<String> getDataLang(String json) {
-
-        return getDataBook(json).langs();
-    }
 
 }

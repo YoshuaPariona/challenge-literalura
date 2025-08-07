@@ -40,6 +40,11 @@ public class BookService {
         String json = apiService.getJson(title);
 
         DataBook dataBook = convertDataService.getDataBook(json);
+
+        if (dataBook == null) {
+            return null;
+        }
+
         List<DataAuthor> dataAuthorsList = convertDataService.getDataAuthor(json);
 
         List<Lang> langs = dataBook.langs().stream()
@@ -74,20 +79,15 @@ public class BookService {
 
     @Transactional
     public List<Book> getAllBooksWithAuthorsAndLangs(String langCode) {
-        // Obtener libros filtrados por lenguaje (con autores y idiomas)
+
         List<Book> booksWithLangsList = bookRepository.findBooksByLangWithAuthors(langCode);
 
-        // Mapa de libros por ID
         Map<Long, Book> booksMap = new HashMap<>();
-
         for (Book book : booksWithLangsList) {
             booksMap.put(book.getId(), book);
         }
 
-        // Obtener libros con autores (aún en la misma sesión, por eso es seguro acceder a la colección de autores)
         List<Book> booksWithAuthorsList = bookRepository.findAllBooksWithAuthors();
-
-        // Completar los libros filtrados con la información de autores
         for (Book bookWithAuthor : booksWithAuthorsList) {
             Book target = booksMap.get(bookWithAuthor.getId());
             if (target != null) {
@@ -95,7 +95,6 @@ public class BookService {
             }
         }
 
-        // Filtrar libros incompletos
         List<Book> completeBooks = booksMap.values().stream()
                 .filter(book -> book.getAuthors() != null && !book.getAuthors().isEmpty()
                         && book.getLangs() != null && !book.getLangs().isEmpty())
